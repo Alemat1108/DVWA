@@ -12,7 +12,12 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
-                    sh "${env.SONARQUBE_SCANNER_HOME}/bin/sonar-scanner"
+                    sh """
+                        ${env.SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://172.25.93.19:9000 \
+                        -Dsonar.login=sonarqube
+                    """
                 }
             }
         }
