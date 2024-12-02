@@ -16,7 +16,7 @@ pipeline {
                         ${env.SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.sources=. \
                         -Dsonar.host.url=http://172.25.93.19:9000 \
-                        -Dsonar.login=sonarqube
+                        -Dsonar.login=squ_364549662ef86dbe5c309d527ad1c7a9a10b5ec1
                     """
                 }
             }
