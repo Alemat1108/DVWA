@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Alemat1108/DVWA'
+                git branch: 'master', url: 'https://github.com/Alemat1108/DVWA'
             }
         }
         stage('SonarQube Analysis') {
