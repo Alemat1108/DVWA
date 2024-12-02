@@ -7,9 +7,12 @@ pipeline {
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sonarqube') {
-                   
+                    sh "${tool 'SonarQubeScanner'}/bin/sonar-scanner \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://172.25.93.19:9000 \
                 }
             }
         }
     }
 }
+
