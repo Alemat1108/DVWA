@@ -16,7 +16,7 @@ pipeline {
                     echo "Iniciando escaneo contra ${TARGET_URL}"
                 }
                 sh """
-                    curl -X GET "${ZAP_HOST}:${ZAP_PORT}/JSON/ascan/action/scan/?url=${TARGET_URL}&recurse=true"
+                    curl -k -X GET "${ZAP_HOST}:${ZAP_PORT}/JSON/ascan/action/scan/?url=${TARGET_URL}&recurse=true"
                 """
             }
         }
@@ -27,7 +27,7 @@ pipeline {
                     while (progress < 100) {
                         progress = sh(
                             script: """
-                                curl -s "${ZAP_HOST}:${ZAP_PORT}/JSON/ascan/view/status/" | jq -r '.status'
+                                curl -k -s "${ZAP_HOST}:${ZAP_PORT}/JSON/ascan/view/status/" | jq -r '.status'
                             """,
                             returnStdout: true
                         ).trim().toInteger()
@@ -40,7 +40,7 @@ pipeline {
         stage('Generate Report') {
             steps {
                 sh """
-                    curl -X GET "${ZAP_HOST}:${ZAP_PORT}/OTHER/core/other/htmlreport/" -o ${ZAP_REPORT}
+                    curl -k -X GET "${ZAP_HOST}:${ZAP_PORT}/OTHER/core/other/htmlreport/" -o ${ZAP_REPORT}
                 """
             }
         }
