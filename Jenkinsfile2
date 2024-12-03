@@ -1,1 +1,60 @@
+pipeline {
+    agent any
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
+    environment {
+        ZAP_HOST = 'https://172.25.93.19' // Dirección de tu servidor ZAP
+        ZAP_PORT = '8000'               // Puerto en el que escucha ZAP
+        TARGET_URL = 'https://github.com/Alemat1108/DVWA' // URL del objetivo
+        ZAP_REPORT = 'zap-report.html'  // Nombre del archivo de reporte
+    }
+    stages {
+        stage('Start OWASP ZAP Scan') {
+            steps {
+                script {
+                    echo "Iniciando escaneo contra ${TARGET_URL}"
+                }
+                sh """
+                    curl -X GET "${ZAP_HOST}:${ZAP_PORT}/JSON/ascan/action/scan/?url=${TARGET_URL}&recurse=true"
+                """
+            }
+        }
+        stage('Monitor Scan Progress') {
+            steps {
+                script {
+                    def progress = 0
+                    while (progress < 100) {
+                        progress = sh(
+                            script: """
+                                curl -s "${ZAP_HOST}:${ZAP_PORT}/JSON/ascan/view/status/" | jq -r '.status'
+                            """,
+                            returnStdout: true
+                        ).trim().toInteger()
+                        echo "Escaneo en progreso: ${progress}%"
+                        sleep 10
+                    }
+                }
+            }
+        }
+        stage('Generate Report') {
+            steps {
+                sh """
+                    curl -X GET "${ZAP_HOST}:${ZAP_PORT}/OTHER/core/other/htmlreport/" -o ${ZAP_REPORT}
+                """
+            }
+        }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: "${ZAP_REPORT}", onlyIfSuccessful: true
+        }
+        success {
+            echo 'Escaneo completado exitosamente.'
+        }
+        failure {
+            echo 'El escaneo falló.'
+        }
+    }
+}
 
