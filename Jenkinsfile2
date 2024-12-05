@@ -1,60 +1,36 @@
 pipeline {
     agent any
-    options {
-        buildDiscarder(logRotator(numToKeepStr: '5'))
-    }
-    environment {
-        ZAP_HOST = 'https://172.25.93.19' // Dirección de tu servidor ZAP
-        ZAP_PORT = '8000'               // Puerto en el que escucha ZAP
-        TARGET_URL = 'https://github.com/Alemat1108/DVWA' // URL del objetivo
-        ZAP_REPORT = 'zap-report.html'  // Nombre del archivo de reporte
-    }
+
     stages {
-        stage('Start OWASP ZAP Scan') {
+        stage('DAST Scan') {
             steps {
                 script {
-                    echo "Iniciando escaneo contra ${TARGET_URL}"
-                }
-                sh """
-                    curl -k -X GET "${ZAP_HOST}:${ZAP_PORT}/JSON/ascan/action/scan/?url=${TARGET_URL}&recurse=true"
-                """
-            }
-        }
-        stage('Monitor Scan Progress') {
-            steps {
-                script {
-                    def progress = 0
-                    while (progress < 100) {
-                        progress = sh(
-                            script: """
-                                curl -k -s "${ZAP_HOST}:${ZAP_PORT}/JSON/ascan/view/status/" | jq -r '.status'
-                            """,
-                            returnStdout: true
-                        ).trim().toInteger()
-                        echo "Escaneo en progreso: ${progress}%"
-                        sleep 10
+                    try {
+                        echo "Inicio de Scaneo Dinamico"
+                        // Ejecuta el comando ZAP en el contenedor existente
+                        sh "docker exec zap zap-cli --verbose quick-scan http://tu-url-de-prueba:puerto -l Medium"
+                        currentBuild.result = 'SUCCESS'
+                    } catch (Exception e) {
+                        println ("Revisar Reporte ZAP. Se encontraron Vulnerabilidades.")
+                        currentBuild.result = 'UNSTABLE'
                     }
                 }
             }
         }
+
         stage('Generate Report') {
             steps {
-                sh """
-                    curl -k -X GET "${ZAP_HOST}:${ZAP_PORT}/OTHER/core/other/htmlreport/" -o ${ZAP_REPORT}
-                """
+                // Genera el reporte usando el contenedor existente
+                sh "docker exec zap zap-cli --verbose report -o /zap/reports/owasp-quick-scan-report.html --output-format html"
+                publishHTML target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: '/zap/reports',
+                    reportFiles: 'owasp-quick-scan-report.html',
+                    reportName: 'Analisis DAST'
+                ]
             }
         }
     }
-    post {
-        always {
-            archiveArtifacts artifacts: "${ZAP_REPORT}", onlyIfSuccessful: true
-        }
-        success {
-            echo 'Escaneo completado exitosamente.'
-        }
-        failure {
-            echo 'El escaneo falló.'
-        }
-    }
 }
-
