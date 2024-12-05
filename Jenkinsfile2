@@ -29,6 +29,7 @@ pipeline {
                     reportDir: '/zap/reports',
                     reportFiles: 'owasp-quick-scan-report.html',
                     reportName: 'Analisis DAST'
+                    curl "https://172.25.93.19:8000"
                 ]
             }
         }
