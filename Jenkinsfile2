@@ -1,39 +1,16 @@
 pipeline {
-    agent {
-        docker {
-            image 'jenkins/jenkins:lts'
-            args '-u root' // Ejecutar como root
-        }
-    }
+    agent any
     stages {
         stage('Run OWASP ZAP Scan') {
             steps {
                 script {
                     sh '''
-                    # Instalar Docker y jq si no están instalados
-                    if ! command -v docker &> /dev/null; then
-                        apt-get update
-                        apt-get install -y docker.io
-                    fi
-
-                    if ! command -v jq &> /dev/null; then
-                        apt-get update
-                        apt-get install -y jq
-                    fi
-
                     # Iniciar un escaneo activo usando la API de ZAP con la verificación del certificado deshabilitada
                     curl -k "https://172.25.93.19:8000/JSON/ascan/action/scan/?url=https://github.com/Alemat1108/DVWA.git"
 
                     # Esperar hasta que el escaneo termine
-                    while true; do
-                        status=$(curl -s -k https://172.25.93.19:8000/JSON/ascan/view/status/ | jq -r '.status')
-
-                        echo "Escaneo en progreso... Estado: $status"
-
-                        if [ "$status" == "100" ]; then
-                            break
-                        fi
-
+                    while [ "$(curl -s https://172.25.93.19:8000/JSON/ascan/view/status/)" != "100" ]; do
+                        echo "Escaneo en progreso..."
                         sleep 5
                     done
 
