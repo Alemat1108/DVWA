@@ -9,8 +9,15 @@ pipeline {
                     curl -k "https://172.25.93.19:8000/JSON/ascan/action/scan/?url=https://github.com/Alemat1108/DVWA.git"
 
                     # Esperar hasta que el escaneo termine
-                    while [ "$(curl -s https://172.25.93.19:8000/JSON/ascan/view/status/)" != "100" ]; do
-                        echo "Escaneo en progreso..."
+                    while true; do
+                        status=$(curl -s https://172.25.93.19:8000/JSON/ascan/view/status/ | jq -r '.status')
+
+                        echo "Escaneo en progreso... Estado: $status"
+
+                        if [ "$status" == "100" ]; then
+                            break
+                        fi
+
                         sleep 5
                     done
 
