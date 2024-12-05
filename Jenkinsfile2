@@ -5,12 +5,18 @@ pipeline {
             steps {
                 script {
                     sh '''
+                    # Instalar jq si no está instalado
+                    if ! command -v jq &> /dev/null; then
+                        apt-get update
+                        apt-get install -y jq
+                    fi
+
                     # Iniciar un escaneo activo usando la API de ZAP con la verificación del certificado deshabilitada
                     curl -k "https://172.25.93.19:8000/JSON/ascan/action/scan/?url=https://github.com/Alemat1108/DVWA.git"
 
                     # Esperar hasta que el escaneo termine
                     while true; do
-                        status=$(curl -s https://172.25.93.19:8000/JSON/ascan/view/status/ | jq -r '.status')
+                        status=$(curl -s -k https://172.25.93.19:8000/JSON/ascan/view/status/ | jq -r '.status')
 
                         echo "Escaneo en progreso... Estado: $status"
 
