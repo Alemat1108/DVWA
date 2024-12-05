@@ -10,7 +10,12 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    # Instalar jq si no está instalado
+                    # Instalar Docker y jq si no están instalados
+                    if ! command -v docker &> /dev/null; then
+                        apt-get update
+                        apt-get install -y docker.io
+                    fi
+
                     if ! command -v jq &> /dev/null; then
                         apt-get update
                         apt-get install -y jq
