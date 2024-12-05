@@ -9,7 +9,7 @@ pipeline {
                     curl -k "https://172.25.93.19:8000/JSON/ascan/action/scan/?url=https://github.com/Alemat1108/DVWA.git"
 
                     # Esperar hasta que el escaneo termine
-                    sleep 40
+                    sleep 100
 
                     # Descargar el informe HTML
                     curl -k "https://172.25.93.19:8000/OTHER/core/other/htmlreport/" > zap-report.html
