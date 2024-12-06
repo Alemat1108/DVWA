@@ -6,13 +6,13 @@ pipeline {
                 script {
                     sh '''
                     # Iniciar un escaneo activo usando la API de ZAP con la verificación del certificado deshabilitada
-                    curl -k "https://localhost:8090/JSON/ascan/action/scan/?url=https://github.com/Alemat1108/DVWA/tree/master"
+                    curl -k "https://172.17.0.4:8090/JSON/ascan/action/scan/?url=https://github.com/Alemat1108/DVWA/tree/master"
 
                     # Esperar hasta que el escaneo termine
                     sleep 50
 
                     # Descargar el informe HTML
-                    curl -k "https://localhost:8090/OTHER/core/other/htmlreport/" > zap-report.html
+                    curl -k "https://172.17.0.4:8090/OTHER/core/other/htmlreport/" > zap-report.html
                     '''
                 }
             }
