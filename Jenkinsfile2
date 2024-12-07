@@ -9,10 +9,9 @@ pipeline {
                     curl -k "https://172.25.93.19:8090/JSON/ascan/action/scan/?url=https://172.25.93.19:8000"
 
                     # Esperar hasta que el escaneo termine
-                    while [ "$(curl -s -k https://172.25.93.19:8090/JSON/ascan/view/status/)" != "100" ]; do
-                        echo "Escaneo en progreso..."
-                        sleep 5
-                    done
+                   
+                    sleep 30
+                    
 
                     # Descargar el informe HTML
                     curl -k "https://172.25.93.19:8090/OTHER/core/other/htmlreport/" > zap-report.html
