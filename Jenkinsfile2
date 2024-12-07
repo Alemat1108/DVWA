@@ -5,26 +5,17 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    # Iniciar un escaneo Spider para agregar la URL al árbol de escaneo
-                    curl -k "https://172.25.93.19:8090/JSON/spider/action/scan/?url=http://localhost:8000"
-
-                    # Esperar hasta que el escaneo Spider termine
-                    while [ "$(curl -s -k https://172.25.93.19:8090/JSON/spider/view/status/ | grep -o '"status":[0-9]*' | grep -o '[0-9]*')" != "0" ]; do
-                        echo "Escaneo Spider en progreso..."
-                        sleep 5
-                    done
-
                     # Iniciar un escaneo activo usando la API de ZAP
-                    curl -k "https://172.25.93.19:8090/JSON/ascan/action/scan/?url=http://localhost:8000"
+                    curl "https://172.25.93.19:8090/UI/ascan/action/scan/?url=https://localhost:8000"
 
-                    # Esperar hasta que el escaneo activo termine
-                    while [ "$(curl -s -k https://172.25.93.19:8090/JSON/ascan/view/status/ | grep -o '"status":[0-9]*' | grep -o '[0-9]*')" != "0" ]; do
-                        echo "Escaneo activo en progreso..."
+                    # Esperar hasta que el escaneo termine
+                    while [ "$(curl -s https://172.25.93.19:8090/UI/ascan/view/status/)" != "100" ]; do
+                        echo "Escaneo en progreso..."
                         sleep 5
                     done
 
                     # Descargar el informe HTML
-                    curl -k "https://172.25.93.19:8090/OTHER/core/other/htmlreport/" > zap-report.html
+                    curl "https://localhost:8090/OTHER/core/other/htmlreport/" > zap-report.html
                     '''
                 }
             }
