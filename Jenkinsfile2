@@ -6,7 +6,7 @@ pipeline {
                 script {
                     sh '''
                     # Iniciar un escaneo Spider para agregar la URL al árbol de escaneo
-                    curl -k "https://172.25.93.19:8090/JSON/spider/action/scan/?url=http://localhost:8000"
+                    curl -k "https://172.25.93.19:8090/JSON/spider/action/scan/?url=http://localhost:80"
 
                     # Esperar hasta que el escaneo Spider termine
                     while true; do
@@ -20,7 +20,7 @@ pipeline {
                     done
 
                     # Iniciar un escaneo activo usando la API de ZAP
-                    SCAN_ID=$(curl -s -k "https://172.25.93.19:8090/JSON/ascan/action/scan/?url=http://localhost:8000" | grep -o '"scan":"[0-9]*"' | grep -o '[0-9]*')
+                    SCAN_ID=$(curl -s -k "https://172.25.93.19:8090/JSON/ascan/action/scan/?url=http://localhost:80" | grep -o '"scan":"[0-9]*"' | grep -o '[0-9]*')
                     echo "ID del escaneo: $SCAN_ID"
 
                     # Esperar hasta que el escaneo activo termine
