@@ -6,16 +6,16 @@ pipeline {
                 script {
                     sh '''
                     # Iniciar un escaneo activo usando la API de ZAP
-                    curl "https://172.25.93.19:8090/UI/ascan/action/scan/?url=https://localhost:8000"
+                    curl -k "https://172.25.93.19:8090/UI/ascan/action/scan/?url=https://localhost:8000"
 
                     # Esperar hasta que el escaneo termine
-                    while [ "$(curl -s https://172.25.93.19:8090/UI/ascan/view/status/)" != "100" ]; do
+                    while [ "$(curl -s -k https://172.25.93.19:8090/UI/ascan/view/status/)" != "100" ]; do
                         echo "Escaneo en progreso..."
                         sleep 5
                     done
 
                     # Descargar el informe HTML
-                    curl "https://localhost:8090/OTHER/core/other/htmlreport/" > zap-report.html
+                    curl -k "https://localhost:8090/OTHER/core/other/htmlreport/" > zap-report.html
                     '''
                 }
             }
@@ -27,5 +27,3 @@ pipeline {
         }
     }
 }
-
-
