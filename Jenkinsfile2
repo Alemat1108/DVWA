@@ -5,16 +5,37 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    # Iniciar un escaneo activo usando la API de ZAP
-                    curl -k "https://172.25.93.19:8090/UI/ascan/action/scan/?url=https://localhost:8000"
+                    # Iniciar un escaneo Spider para agregar la URL al árbol de escaneo
+                    curl -k "https://172.25.93.19:8090/JSON/spider/action/scan/?url=http://localhost:8000"
 
-                    # Esperar hasta que el escaneo termine
-                    
-                    sleep 30
-                    
+                    # Esperar hasta que el escaneo Spider termine
+                    while true; do
+                        STATUS=$(curl -s -k https://172.25.93.19:8090/JSON/spider/view/status/ | grep -o '"status":[0-9]*' | grep -o '[0-9]*')
+                        echo "Estado actual del Spider: $STATUS"
+                        if [ "$STATUS" = "0" ]; then
+                            break
+                        fi
+                        echo "Escaneo Spider en progreso..."
+                        sleep 5
+                    done
+
+                    # Iniciar un escaneo activo usando la API de ZAP
+                    SCAN_ID=$(curl -s -k "https://172.25.93.19:8090/JSON/ascan/action/scan/?url=http://localhost:8000" | grep -o '"scan":"[0-9]*"' | grep -o '[0-9]*')
+                    echo "ID del escaneo: $SCAN_ID"
+
+                    # Esperar hasta que el escaneo activo termine
+                    while true; do
+                        STATUS=$(curl -s -k "https://172.25.93.19:8090/JSON/ascan/view/status/?scanId=$SCAN_ID" | grep -o '"status":[0-9]*' | grep -o '[0-9]*')
+                        echo "Estado actual del escaneo activo: $STATUS"
+                        if [ "$STATUS" = "100" ]; then
+                            break
+                        fi
+                        echo "Escaneo activo en progreso..."
+                        sleep 5
+                    done
 
                     # Descargar el informe HTML
-                    curl -k "https://localhost:8090/OTHER/core/other/htmlreport/" > zap-report.html
+                    curl -k "https://172.25.93.19:8090/OTHER/core/other/htmlreport/" > zap-report.html
                     '''
                 }
             }
