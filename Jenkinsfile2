@@ -6,7 +6,7 @@ pipeline {
                 script {
                     sh '''
                     # Iniciar un escaneo activo usando la API de ZAP
-                    curl -k "https://172.25.93.19:8090/JSON/ascan/action/scan/?url=https://github.com/Alemat1108/DVWA.git"
+                    curl -k "https://172.25.93.19:8090/JSON/ascan/action/scan/?url=https://172.25.93.19:8000"
 
                     # Esperar hasta que el escaneo termine
                     while [ "$(curl -s -k https://172.25.93.19:8090/JSON/ascan/view/status/)" != "100" ]; do
