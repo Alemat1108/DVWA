@@ -19,7 +19,7 @@ pipeline {
                     ${ZAP_API}/JSON/spider/action/scan/
                 echo "Esperando a que el Spider Scan finalice..."
                 while true; do
-                    response=$(curl -k -s ${ZAP_API}/JSON/spider/view/status/?apikey=${ZAP_API_KEY})
+                    response=$(curl -k -s ${ZAP_API}/UI/spider/view/status/?apikey=${ZAP_API_KEY})
                     status=$(echo "$response" | grep -o '"status":"[0-9]*"' | sed 's/[^0-9]//g')
                     if [ "$status" -eq 100 ]; then
                         break
@@ -38,10 +38,10 @@ pipeline {
                 curl -k -X POST \
                     -d "apikey=${ZAP_API_KEY}" \
                     -d "url=${TARGET_URL}" \
-                    ${ZAP_API}/JSON/ascan/action/scan/
+                    ${ZAP_API}/UI/ascan/action/scan/
                 echo "Esperando a que el Active Scan finalice..."
                 while true; do
-                    response=$(curl -k -s ${ZAP_API}/JSON/ascan/view/status/?apikey=${ZAP_API_KEY})
+                    response=$(curl -k -s ${ZAP_API}/UI/ascan/view/status/?apikey=${ZAP_API_KEY})
                     status=$(echo "$response" | grep -o '"status":"[0-9]*"' | sed 's/[^0-9]//g')
                     if [ "$status" -eq 100 ]; then
                         break
