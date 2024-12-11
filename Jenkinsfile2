@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         JENKINS_URL = 'http://localhost:8080' // URL de Jenkins
-        ZAP_API = 'https://172.25.93.19:8090'    // URL de la API de OWASP ZAP
+        ZAP_API = 'https://172.17.0.3:8090'    // URL de la API de OWASP ZAP
         ZAP_API_KEY = 'root'             // API Key de OWASP ZAP
         TARGET_URL = 'https://172.25.93.19:8000' // URL de la aplicación TIWAP
     }
